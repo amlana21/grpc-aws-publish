@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/amlana21/grpc-aws/proto";
+
+message User {
+
+string id = 1;
+string username = 2;
+string email = 3;
+string role =4;
+}
+
+
+message UserId {
+string id = 1;
+}
+
+message UserList {
+    repeated User user = 1;
+ }
+
+service UserService {
+rpc CreateUser(User) returns (UserId);
+rpc ListUsers(google.protobuf.Empty) returns (UserList);
+}

@@ -1,0 +1,52 @@
+
+version: '3.8'
+services:
+  grpc_client:
+    networks:
+      - grpc-labs
+    depends_on:
+      - grpc_server
+    build:
+      context: backend
+      dockerfile: Dockerfile-client
+    container_name: grpc_client
+    ports:
+      - "50052:50052"
+
+  client_frontend:
+    networks:
+      - grpc-labs
+    container_name: client_frontend
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - "50058:80"
+    stop_signal: SIGINT
+    depends_on:
+      - envoy_service
+      - grpc_server
+  grpc_server:
+    networks:
+      - grpc-labs
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: grpc_server
+    ports:
+      - "50051:50051"
+  envoy_service:
+    ports:
+      - "50054:8000"
+      - "8000:8000"
+    networks:
+      - grpc-labs
+    build:
+      context: proxy_svc
+      dockerfile: Dockerfile-envoy
+    volumes:
+      - ./proxy_svc/envoy.yaml:/etc/envoy/envoy.yaml
+
+networks:
+  grpc-labs:
+    driver: bridge
